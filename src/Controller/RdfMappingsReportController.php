@@ -45,14 +45,22 @@ class RdfMappingsReportController extends ControllerBase {
     foreach ($entity_types as $entity_type) {
       $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
       foreach ($bundles as $name => $attr) {
-        $markup .= '<h3>' . $attr['label'] . ' (' . $entity_type . ')' . '</h3>';
         $rdf_mappings = rdf_get_mapping($entity_type, $name);
+        $rdf_types = $rdf_mappings->getPreparedBundleMapping();
+        if (array_key_exists('types', $rdf_types) && count($rdf_types['types']) > 0) {
+          $rdf_types = implode(', ', $rdf_types['types']);
+          $markup .= '<h3>' . $attr['label'] . ' (' . $entity_type . ')' . ', mapped to RDF type ' . $rdf_types . '</h3>';
+        }
+        else {
+          $markup .= '<h3>' . $attr['label'] . ' (' . $entity_type . ') - no RDF type mapping</h3>';
+        }
         $fields = \Drupal::entityManager()->getFieldDefinitions($entity_type, $name);
         $mappings_table_rows = [];
         foreach ($fields as $field_name => $field_object) {
           $field_mappings = $rdf_mappings->getPreparedFieldMapping($field_name);
           if (array_key_exists('properties', $field_mappings)) {
-            $mappings_table_rows[] = [$field_object->getLabel() . ' (' . $field_name . ')', $field_mappings['properties'][0]];
+            $properties = implode(', ', $field_mappings['properties']);
+            $mappings_table_rows[] = [$field_object->getLabel() . ' (' . $field_name . ')', $properties];
           }
         }
 
@@ -80,9 +88,17 @@ class RdfMappingsReportController extends ControllerBase {
 
     $vocabs = Vocabulary::loadMultiple();
     foreach ($vocabs as $vid => $vocab) {
+      $rdf_mappings = rdf_get_mapping('taxonomy_term', $vid);
+      $rdf_types = $rdf_mappings->getPreparedBundleMapping();
       $vocab_table_header = [];
       $vocab_table_rows = [];
-      $markup .= '<h3>' . $vocab->label() . ' (' . $vid . ')</h3>';
+      if (array_key_exists('types', $rdf_types) && count($rdf_types['types']) > 0) {
+        $rdf_types = implode(', ', $rdf_types['types']);
+        $markup .= '<h3>' . $vocab->label() . ' (' . $vid . ')' . ', mapped to RDF type ' . $rdf_types . '</h3>';
+      }
+      else {
+        $markup .= '<h3>' . $vocab->label() . ' (' . $vid . ') - no RDF type mapping</h3>';
+      }
       $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid);
       if (count($terms) == 0) {
         $vocab_table_rows[] = [t('No terms in this vocabulary.')];
