@@ -329,8 +329,7 @@ function islandora_form_alter(&$form, FormStateInterface $form_state, $form_id) 
     $params = \Drupal::request()->query->all();
     $media_of_nid = $params['edit']['field_media_of']['widget'][0]['target_id'];
     $node = \Drupal::entityTypeManager()->getStorage('node')->load($media_of_nid);
-    $title = $node->getTitle();
-    $form['name']['widget'][0]['value']['#default_value'] = $title;
+    $form['name']['widget'][0]['value']['#default_value'] = $node->getTitle();
   }
 }
 
@@ -349,8 +348,7 @@ function islandora_add_default_image_alt_text($element, $form_state, $form) {
     $params = \Drupal::request()->query->all();
     $media_of_nid = $params['edit']['field_media_of']['widget'][0]['target_id'];
     $node = \Drupal::entityTypeManager()->getStorage('node')->load($media_of_nid);
-    $title = $node->getTitle();
-    $element['alt']['#default_value'] = $title;
+    $element['alt']['#default_value'] = $node->getTitle();
   }
   return $element;
 }
