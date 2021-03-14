@@ -61,7 +61,9 @@ class RdfMappingsReportController extends ControllerBase {
           if (array_key_exists('properties', $field_mappings)) {
             $properties = implode(', ', $field_mappings['properties']);
             $mappings_table_rows[] = [
-              $field_object->getLabel() . ' (' . $field_name . ')', $properties,
+              $field_object->getLabel() .
+              ' (' . $field_name . ')',
+              $properties,
             ]
           }
         }
