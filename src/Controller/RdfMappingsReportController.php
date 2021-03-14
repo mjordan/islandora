@@ -64,7 +64,7 @@ class RdfMappingsReportController extends ControllerBase {
               $field_object->getLabel() .
               ' (' . $field_name . ')',
               $properties,
-            ]
+            ];
           }
         }
 
